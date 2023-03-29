@@ -1,9 +1,17 @@
-workflows:
-  ios_build:
-    name: "Build iOS Debug"
-    environment:
-      xcode: "13.3"
-    scripts:
-
-    artifacts:
-      - build/ios/**/*.ipa
+scripts:
+  - name: Set up code signing settings on Xcode project
+    script: | 
+      xcode-project use-profiles
+  - name: Get Flutter packages
+    script: | 
+      flutter packages pub get
+  - name: Install pods
+    script: | 
+      find . -name "Podfile" -execdir pod install \;
+  - name: Flutter build ipa
+    script: | 
+      flutter build ios --debug --no-codesign
+  artifacts:
+    - build/ios/ipa/*.ipa
+    - /tmp/xcodebuild_logs/*.log
+    - flutter_drive.log
