@@ -1,5 +1,8 @@
+workflows:
+  ios-workflow:
+    name: iOS Workflow
 scripts:
-  - name: Set up code signing settings on Xcode project
+  - name: Flutter build ipa
     script: |
       xcode-project use-profiles --project hello_app.xcodeproj
   - name: Get Flutter packages
