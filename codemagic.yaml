@@ -4,6 +4,6 @@ workflows:
     environment:
       xcode: "13.3"
     scripts:
-      - xcodebuild -workspace hello_app.xcworkspace -scheme hello_app -destination 'platform=iOS Simulator,name=iPhone 12,OS=14.5' -configuration Debug clean build
+
     artifacts:
       - build/ios/**/*.ipa
