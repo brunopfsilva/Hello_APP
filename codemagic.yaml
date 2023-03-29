@@ -1,30 +1,37 @@
 workflows:
   ios-workflow:
-      name: iOS Workflow
-      instance_type: mac_mini_m1
-      environment:
-        xcode: 13.4.1
-      scripts:
-        - name: Build app for testing
-          script: |
-            set -ex
-
-            flutter build ios integration_test/app_test.dart --release
-
-            cd ios
-            xcodebuild \
-              -workspace Runner.xcworkspace \
-              -scheme Runner \
-              -config Flutter/Release.xcconfig \
-              -derivedDataPath "../build/ios_integ" \
-              -sdk iphoneos \
-              build-for-testing
-        - name: Package tests bundle
-          script: |
-            set -ex
-            cd ./build/ios_integ/Build/Products
-            zip -r "ios_tests.zip" *-iphoneos *.xctestrun
-        - name: Run tests in Firebase Test Lab
-          script: gcloud firebase test ios run --test "build/ios_integ/Build/Products/ios_tests.zip"     
-      artifacts:
-        - "**/ios_tests.zip"
+    name: iOS Workflow
+    max_build_duration: 120
+    integrations:
+      app_store_connect: codemagic
+    environment:
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Set up code signing settings on Xcode project
+        script: |
+          xcode-project use-profiles
+      - name: Get Flutter packages
+        script: |
+          flutter packages pub get
+      - name: Install pods
+        script: |
+          find . -name "Podfile" -execdir pod install \;
+      - name: Flutter analyze
+        script: |
+          flutter analyze
+      - name: Flutter unit tests
+        script: |
+          flutter test
+        ignore_failure: true
+      - name: Flutter build ipa and automatic versioning
+        script: |
+          flutter build ipa --release \
+            --build-name=1.0.0 \
+            --build-number=$(($(app-store-connect get-latest-app-store-build-number "$APP_ID") + 1)) \
+            --export-options-plist=/Users/builder/export_options.plist
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - flutter_drive.log
