@@ -1,5 +1,9 @@
 workflows:
-    sample-workflow:
-        name: Add first workflow
-        max_build_duration: 120
-        instance_type: mac_mini_m1
+  ios_build:
+    name: "Build iOS Debug"
+    environment:
+      xcode: "12.5.1"
+    scripts:
+      - xcodebuild -workspace yourproject.xcworkspace -scheme yourproject -destination 'platform=iOS Simulator,name=iPhone 12,OS=14.5' -configuration Debug clean build
+    artifacts:
+      - build/ios/**/*.ipa
