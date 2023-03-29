@@ -2,7 +2,7 @@ workflows:
   ios_build:
     name: "Build iOS Debug"
     environment:
-      xcode: "12.5.1"
+      xcode: "13.3"
     scripts:
       - xcodebuild -workspace yourproject.xcworkspace -scheme yourproject -destination 'platform=iOS Simulator,name=iPhone 12,OS=14.5' -configuration Debug clean build
     artifacts:
